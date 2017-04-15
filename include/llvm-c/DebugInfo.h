@@ -1,3 +1,16 @@
+//===------------ DebugInfo.h - LLVM C API Debug Info API -----------------===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is distributed under the University of Illinois Open Source
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+//
+// This file declares the C API endpoints for generating DWARF Debug Info
+//
+//===----------------------------------------------------------------------===//
+
 #include "llvm-c/Core.h"
 
 typedef struct LLVMOpaqueMetadata *LLVMMetadataRef;
@@ -29,7 +42,7 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
-    const char *Producer, bool isOptimized, const char *Flags,
+    const char *Producer, uint8_t isOptimized, const char *Flags,
     unsigned RuntimeVer, const char *SplitName);
 
 LLVMMetadataRef
@@ -44,8 +57,8 @@ LLVMDIBuilderCreateSubroutineType(LLVMDIBuilderRef Builder,
 LLVMMetadataRef LLVMDIBuilderCreateFunction(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, bool IsLocalToUnit, bool IsDefinition,
-    unsigned ScopeLine, LLVMDIFlags Flags, bool IsOptimized,
+    LLVMMetadataRef Ty, uint8_t IsLocalToUnit, uint8_t IsDefinition,
+    unsigned ScopeLine, LLVMDIFlags Flags, uint8_t IsOptimized,
     LLVMValueRef Fn, LLVMMetadataRef TParam, LLVMMetadataRef Decl);
 
 LLVMMetadataRef
@@ -81,13 +94,13 @@ LLVMDIBuilderCreateLexicalBlockFile(LLVMDIBuilderRef Builder,
 LLVMMetadataRef LLVMDIBuilderCreateStaticVariable(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Context, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, bool IsLocalToUnit, LLVMValueRef V,
-    LLVMMetadataRef Decl = nullptr, uint32_t AlignInBits = 0);
+    LLVMMetadataRef Ty, uint8_t IsLocalToUnit, LLVMValueRef V,
+    LLVMMetadataRef Decl, uint32_t AlignInBits);
 
 LLVMMetadataRef LLVMDIBuilderCreateVariable(
     LLVMDIBuilderRef Builder, unsigned Tag, LLVMMetadataRef Scope,
     const char *Name, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, bool AlwaysPreserve, LLVMDIFlags Flags,
+    LLVMMetadataRef Ty, uint8_t AlwaysPreserve, LLVMDIFlags Flags,
     unsigned ArgNo, uint32_t AlignInBits);
 
 LLVMMetadataRef
