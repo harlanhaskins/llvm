@@ -44,7 +44,7 @@ LLVMMetadataRef LLVMDIBuilderCreateClassType(LLVMDIBuilderRef Builder,
     LLVMMetadataRef Scope, const char *Name, LLVMMetadataRef File,
     unsigned LineNumber, uint64_t SizeInBits, uint32_t AlignInBits,
     uint64_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef DerivedFrom,
-    LLVMMetadataRef Elements);
+    LLVMMetadataRef *Elements, unsigned NumElements);
 
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
@@ -58,14 +58,16 @@ LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
 LLVMMetadataRef
 LLVMDIBuilderCreateSubroutineType(LLVMDIBuilderRef Builder,
                                   LLVMMetadataRef File,
-                                  LLVMMetadataRef ParameterTypes);
+                                  LLVMMetadataRef *ParameterTypes,
+                                  unsigned NumParameterTypes);
 
 LLVMMetadataRef LLVMDIBuilderCreateFunction(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
     LLVMMetadataRef Ty, uint8_t IsLocalToUnit, uint8_t IsDefinition,
     unsigned ScopeLine, LLVMDIFlags Flags, uint8_t IsOptimized,
-    LLVMValueRef Fn, LLVMMetadataRef TParam, LLVMMetadataRef Decl);
+    LLVMValueRef Fn, LLVMMetadataRef *TemplateParams,
+    unsigned NumTemplateParams, LLVMMetadataRef Decl);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateArtificialType(LLVMDIBuilderRef Builder,
@@ -102,14 +104,16 @@ LLVMDIBuilderCreateBasicType(LLVMDIBuilderRef Builder, const char *Name,
 
 LLVMMetadataRef LLVMDIBuilderCreatePointerType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef PointeeTy,
-    uint64_t SizeInBits, uint32_t AlignInBits, const char *Name);
+    uint64_t SizeInBits, uint32_t AlignInBits, unsigned AddressSpace,
+    const char *Name);
 
 LLVMMetadataRef LLVMDIBuilderCreateStructType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     LLVMMetadataRef File, unsigned LineNumber, uint64_t SizeInBits,
     uint32_t AlignInBits, LLVMDIFlags Flags,
-    LLVMMetadataRef DerivedFrom, LLVMMetadataRef Elements,
-    unsigned RunTimeLang, LLVMMetadataRef VTableHolder, const char *UniqueId);
+    LLVMMetadataRef DerivedFrom, LLVMMetadataRef *Elements,
+    unsigned NumElements, unsigned RunTimeLang, LLVMMetadataRef VTableHolder,
+    const char *UniqueId);
 
 LLVMMetadataRef LLVMDIBuilderCreateMemberType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
@@ -153,12 +157,14 @@ LLVMMetadataRef LLVMDIBuilderCreateVariable(
 LLVMMetadataRef
 LLVMDIBuilderCreateArrayType(LLVMDIBuilderRef Builder, uint64_t Size,
                              uint32_t AlignInBits, LLVMMetadataRef Ty,
-                             LLVMMetadataRef Subscripts);
+                             LLVMMetadataRef *Subscripts,
+                             unsigned NumSubscripts);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateVectorType(LLVMDIBuilderRef Builder, uint64_t Size,
                               uint32_t AlignInBits, LLVMMetadataRef Ty,
-                              LLVMMetadataRef Subscripts);
+                              LLVMMetadataRef *Subscripts,
+                              unsigned NumSubscripts);
 
 LLVMMetadataRef
 LLVMDIBuilderGetOrCreateSubrange(LLVMDIBuilderRef Builder, int64_t Lo,
@@ -192,14 +198,14 @@ LLVMDIBuilderCreateEnumerator(LLVMDIBuilderRef Builder,
 LLVMMetadataRef LLVMDIBuilderCreateEnumerationType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     LLVMMetadataRef File, unsigned LineNumber, uint64_t SizeInBits,
-    uint32_t AlignInBits, LLVMMetadataRef Elements,
+    uint32_t AlignInBits, LLVMMetadataRef *Elements, unsigned NumElements,
     LLVMMetadataRef ClassTy);
 
 LLVMMetadataRef LLVMDIBuilderCreateUnionType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     LLVMMetadataRef File, unsigned LineNumber, uint64_t SizeInBits,
-    uint32_t AlignInBits, LLVMDIFlags Flags, LLVMMetadataRef Elements,
-    unsigned RunTimeLang, const char *UniqueId);
+    uint32_t AlignInBits, LLVMDIFlags Flags, LLVMMetadataRef *Elements,
+    unsigned NumElements, unsigned RunTimeLang, const char *UniqueId);
 
 LLVMMetadataRef LLVMDIBuilderCreateTemplateTypeParameter(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
@@ -209,12 +215,12 @@ LLVMMetadataRef LLVMDIBuilderCreateTemplateTypeParameter(
 LLVMMetadataRef
 LLVMDIBuilderCreateNameSpace(LLVMDIBuilderRef Builder,
                              LLVMMetadataRef Scope, const char *Name,
-                             LLVMMetadataRef File, unsigned LineNo);
+                             LLVMMetadataRef File, unsigned LineNo,
+                             uint8_t ExportSymbols);
 
-void
-LLVMDICompositeTypeSetTypeArray(LLVMDIBuilderRef Builder,
-                                LLVMMetadataRef CompositeTy,
-                                LLVMMetadataRef TyArray);
+void LLVMDICompositeTypeSetTypeArray(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef CompositeTy,
+                                     LLVMMetadataRef *Types, unsigned NumTypes);
 
 LLVMValueRef
 LLVMDIBuilderCreateDebugLocation(LLVMContextRef ContextRef, unsigned Line,

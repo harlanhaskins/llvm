@@ -682,6 +682,7 @@ static DINode::DIFlags fromC(LLVMDIFlags Flags) {
   return static_cast<DINode::DIFlags>(Flags);
 }
 
+extern "C" {
 uint32_t LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
 }
@@ -1031,11 +1032,10 @@ LLVMDIBuilderCreateNameSpace(LLVMDIBuilderRef Builder,
       ExportSymbols));
 }
 
-void
-LLVMDICompositeTypeSetTypeArray(LLVMDIBuilderRef Builder,
-                                LLVMMetadataRef CompositeTy,
-                                LLVMMetadataRef *Types,
-                                unsigned NumTypes) {
+void LLVMDICompositeTypeSetTypeArray(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef CompositeTy,
+                                     LLVMMetadataRef *Types,
+                                     unsigned NumTypes) {
   DICompositeType *Tmp = unwrapDI<DICompositeType>(CompositeTy);
   auto Tys = unwrap(Builder)->getOrCreateArray({unwrap(Types), NumTypes});
   unwrap(Builder)->replaceArrays(Tmp, Tys);
@@ -1051,4 +1051,5 @@ LLVMDIBuilderCreateDebugLocation(LLVMContextRef ContextRef, unsigned Line,
                                      unwrapDI<MDNode>(InlinedAt));
 
   return wrap(MetadataAsValue::get(Context, DebugLoc.getAsMDNode()));
+}
 }
