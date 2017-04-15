@@ -69,6 +69,13 @@ LLVMMetadataRef LLVMDIBuilderCreateFunction(
     LLVMValueRef Fn, LLVMMetadataRef *TemplateParams,
     unsigned NumTemplateParams, LLVMMetadataRef Decl);
 
+LLVMMetadataRef LLVMDIBuilderCreateNullPtrType(LLVMDIBuilderRef Builder);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateModule(LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
+                          const char *Name, const char *ConfigurationMacros,
+                          const char *IncludePath, const char *ISysRoot);
+
 LLVMMetadataRef
 LLVMDIBuilderCreateArtificialType(LLVMDIBuilderRef Builder,
                                   LLVMMetadataRef Type);
@@ -92,6 +99,33 @@ LLVMMetadataRef
 LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder, unsigned Tag,
                                const char *Name, LLVMMetadataRef Scope,
                                LLVMMetadataRef File, unsigned Line);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateMethod(LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
+                          const char *Name, const char *LinkageName,
+                          LLVMMetadataRef File, unsigned LineNumber,
+                          LLVMMetadataRef FuncTy, uint8_t LocalToUnit,
+                          uint8_t IsDefinition);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTypedef(LLVMDIBuilderRef Builder, LLVMMetadataRef Type,
+                           const char *Name, LLVMMetadataRef File,
+                           unsigned Line, LLVMMetadataRef Scope);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateInheritance(LLVMDIBuilderRef Builder, LLVMMetadataRef Type,
+                               LLVMMetadataRef BaseType, uint64_t BaseOffset,
+                               LLVMDIFlags Flags);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateMacro(LLVMDIBuilderRef Builder,
+                         LLVMMetadataRef ParentMacroFile, unsigned Line,
+                         unsigned MacroType, const char *Name);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTempMacroFile(LLVMDIBuilderRef Builder,
+                                 LLVMMetadataRef ParentMacroFile,
+                                 unsigned Line, LLVMMetadataRef File);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateFriend(LLVMDIBuilderRef Builder,
@@ -121,9 +155,46 @@ LLVMMetadataRef LLVMDIBuilderCreateMemberType(
     uint32_t AlignInBits, uint64_t OffsetInBits, LLVMDIFlags Flags,
     LLVMMetadataRef Ty);
 
+LLVMMetadataRef
+LLVMDIBuilderCreateStaticMemberType(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    LLVMMetadataRef File, unsigned LineNumber, LLVMMetadataRef Type,
+    LLVMDIFlags Flags, LLVMValueRef ConstantVal);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateMemberPointerType(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef PointeeType,
+                                     LLVMMetadataRef ClassType,
+                                     uint64_t SizeInBits);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateObjectPointerType(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateQualifiedType(LLVMDIBuilderRef Builder, unsigned Tag,
+                                 LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateReferenceType(LLVMDIBuilderRef Builder, unsigned Tag,
+                                 LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateNullPtrType(LLVMDIBuilderRef Builder);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateReplaceableCompositeType(
+    LLVMDIBuilderRef Builder, unsigned Tag, const char *Name,
+    LLVMMetadataRef Scope, LLVMMetadataRef File, unsigned Line);
+
 LLVMMetadataRef LLVMDIBuilderCreateLexicalBlock(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
     LLVMMetadataRef File, unsigned Line, unsigned Col);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateParameterVariable(LLVMDIBuilderRef Builder,
+    LLVMMetadataRef Scope, const char *Name, unsigned ArgNum,
+    LLVMMetadataRef File, unsigned LineNum, LLVMMetadataRef Type);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateLexicalBlockFile(LLVMDIBuilderRef Builder,

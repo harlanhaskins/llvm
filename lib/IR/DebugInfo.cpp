@@ -801,6 +801,128 @@ LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder, unsigned Tag,
 }
 
 LLVMMetadataRef
+LLVMDIBuilderCreateMethod(LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
+                          const char *Name, const char *LinkageName,
+                          LLVMMetadataRef File, unsigned LineNumber,
+                          LLVMMetadataRef FuncTy, uint8_t LocalToUnit,
+                          uint8_t IsDefinition) {
+  return wrap(unwrap(Builder)->createMethod(unwrapDI<DIScope>(Scope),
+                                            Name, LinkageName,
+                                            unwrapDI<DIFile>(File), LineNumber,
+                                            unwrapDI<DISubroutineType>(FuncTy),
+                                            LocalToUnit, IsDefinition));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTypedef(LLVMDIBuilderRef Builder, LLVMMetadataRef Type,
+                           const char *Name, LLVMMetadataRef File,
+                           unsigned Line, LLVMMetadataRef Scope) {
+  return wrap(unwrap(Builder)->createTypedef(unwrapDI<DIType>(Type), Name,
+                                             unwrapDI<DIFile>(File), Line,
+                                             unwrapDI<DIScope>(Scope)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateInheritance(LLVMDIBuilderRef Builder, LLVMMetadataRef Type,
+                               LLVMMetadataRef BaseType, uint64_t BaseOffset,
+                               LLVMDIFlags Flags) {
+  return wrap(unwrap(Builder)->createInheritance(unwrapDI<DIType>(Type),
+                                                 unwrapDI<DIType>(BaseType),
+                                                 BaseOffset, fromC(Flags)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateMacro(LLVMDIBuilderRef Builder,
+                         LLVMMetadataRef ParentMacroFile, unsigned Line,
+                         unsigned MacroType, const char *Name) {
+  return wrap(unwrap(Builder)->createMacro(
+                unwrapDI<DIMacroFile>(ParentMacroFile), Line, MacroType, Name));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTempMacroFile(LLVMDIBuilderRef Builder,
+                                 LLVMMetadataRef ParentMacroFile,
+                                 unsigned Line, LLVMMetadataRef File) {
+  return wrap(unwrap(Builder)->createTempMacroFile(
+                unwrapDI<DIMacroFile>(ParentMacroFile), Line,
+                unwrapDI<DIFile>(File)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateMemberPointerType(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef PointeeType,
+                                     LLVMMetadataRef ClassType,
+                                     uint64_t SizeInBits) {
+  return wrap(unwrap(Builder)->createMemberPointerType(
+                  unwrapDI<DIType>(PointeeType),
+                  unwrapDI<DIType>(ClassType), SizeInBits));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateModule(LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
+                          const char *Name, const char *ConfigurationMacros,
+                          const char *IncludePath, const char *ISysRoot) {
+  return wrap(unwrap(Builder)->createModule(unwrapDI<DIScope>(Scope), Name,
+                                            ConfigurationMacros, IncludePath,
+                                            ISysRoot));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateNullPtrType(LLVMDIBuilderRef Builder) {
+  return wrap(unwrap(Builder)->createNullPtrType());
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateParameterVariable(LLVMDIBuilderRef Builder,
+    LLVMMetadataRef Scope, const char *Name, unsigned ArgNum,
+    LLVMMetadataRef File, unsigned LineNum, LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createParameterVariable(
+                  unwrapDI<DIScope>(Scope), Name, ArgNum,
+                  unwrapDI<DIFile>(File), LineNum, unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateQualifiedType(LLVMDIBuilderRef Builder, unsigned Tag,
+                                 LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createQualifiedType(Tag,
+                                                   unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateReferenceType(LLVMDIBuilderRef Builder, unsigned Tag,
+                                 LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createReferenceType(Tag,
+                                                   unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateReplaceableCompositeType(
+    LLVMDIBuilderRef Builder, unsigned Tag, const char *Name,
+    LLVMMetadataRef Scope, LLVMMetadataRef File, unsigned Line) {
+  return wrap(unwrap(Builder)->createReplaceableCompositeType(
+                  Tag, Name, unwrapDI<DIScope>(Scope),
+                  unwrapDI<DIFile>(File), Line));
+}
+
+
+LLVMMetadataRef
+LLVMDIBuilderCreateStaticMemberType(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    LLVMMetadataRef File, unsigned LineNumber, LLVMMetadataRef Type,
+    LLVMDIFlags Flags, LLVMValueRef ConstantVal) {
+  return wrap(unwrap(Builder)->createStaticMemberType(
+                  unwrapDI<DIScope>(Scope), Name, unwrapDI<DIFile>(File),
+                  LineNumber, unwrapDI<DIType>(Type), fromC(Flags),
+                  unwrap<Constant>(ConstantVal)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateObjectPointerType(LLVMDIBuilderRef Builder,
+                                     LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createObjectPointerType(unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
 LLVMDIBuilderCreateFriend(LLVMDIBuilderRef Builder,
                           LLVMMetadataRef Type,
                           LLVMMetadataRef FriendType) {
