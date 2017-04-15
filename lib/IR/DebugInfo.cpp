@@ -681,88 +681,8 @@ template <typename DIT> DIT *unwrapDI(LLVMMetadataRef Ref) {
 #define DIDescriptor DIScope
 #define DIArray DINodeArray
 
-inline LLVMDIFlags operator&(LLVMDIFlags A, LLVMDIFlags B) {
-  return static_cast<LLVMDIFlags>(static_cast<uint32_t>(A) &
-                                      static_cast<uint32_t>(B));
-}
-
-inline LLVMDIFlags operator|(LLVMDIFlags A, LLVMDIFlags B) {
-  return static_cast<LLVMDIFlags>(static_cast<uint32_t>(A) |
-                                      static_cast<uint32_t>(B));
-}
-
-inline LLVMDIFlags &operator|=(LLVMDIFlags &A, LLVMDIFlags B) {
-  return A = A | B;
-}
-
-inline bool isSet(LLVMDIFlags F) { return F != LLVMDIFlagZero; }
-
-inline LLVMDIFlags visibility(LLVMDIFlags F) {
-  return static_cast<LLVMDIFlags>(static_cast<uint32_t>(F) & 0x3);
-}
-
 static DINode::DIFlags fromC(LLVMDIFlags Flags) {
-  DINode::DIFlags Result = DINode::DIFlags::FlagZero;
-
-  switch (visibility(Flags)) {
-  case LLVMDIFlagPrivate:
-    Result |= DINode::DIFlags::FlagPrivate;
-    break;
-  case LLVMDIFlagProtected:
-    Result |= DINode::DIFlags::FlagProtected;
-    break;
-  case LLVMDIFlagPublic:
-    Result |= DINode::DIFlags::FlagPublic;
-    break;
-  default:
-    // The rest are handled below
-    break;
-  }
-
-  if (isSet(Flags & LLVMDIFlagFwdDecl)) {
-    Result |= DINode::DIFlags::FlagFwdDecl;
-  }
-  if (isSet(Flags & LLVMDIFlagAppleBlock)) {
-    Result |= DINode::DIFlags::FlagAppleBlock;
-  }
-  if (isSet(Flags & LLVMDIFlagBlockByrefStruct)) {
-    Result |= DINode::DIFlags::FlagBlockByrefStruct;
-  }
-  if (isSet(Flags & LLVMDIFlagVirtual)) {
-    Result |= DINode::DIFlags::FlagVirtual;
-  }
-  if (isSet(Flags & LLVMDIFlagArtificial)) {
-    Result |= DINode::DIFlags::FlagArtificial;
-  }
-  if (isSet(Flags & LLVMDIFlagExplicit)) {
-    Result |= DINode::DIFlags::FlagExplicit;
-  }
-  if (isSet(Flags & LLVMDIFlagPrototyped)) {
-    Result |= DINode::DIFlags::FlagPrototyped;
-  }
-  if (isSet(Flags & LLVMDIFlagObjcClassComplete)) {
-    Result |= DINode::DIFlags::FlagObjcClassComplete;
-  }
-  if (isSet(Flags & LLVMDIFlagObjectPointer)) {
-    Result |= DINode::DIFlags::FlagObjectPointer;
-  }
-  if (isSet(Flags & LLVMDIFlagVector)) {
-    Result |= DINode::DIFlags::FlagVector;
-  }
-  if (isSet(Flags & LLVMDIFlagStaticMember)) {
-    Result |= DINode::DIFlags::FlagStaticMember;
-  }
-  if (isSet(Flags & LLVMDIFlagLValueReference)) {
-    Result |= DINode::DIFlags::FlagLValueReference;
-  }
-  if (isSet(Flags & LLVMDIFlagRValueReference)) {
-    Result |= DINode::DIFlags::FlagRValueReference;
-  }
-  if (isSet(Flags & LLVMDIFlagMainSubprogram)) {
-    Result |= DINode::DIFlags::FlagMainSubprogram;
-  }
-
-  return Result;
+  return static_cast<DINode::DIFlags>(Flags);
 }
 
 uint32_t LLVMDebugMetadataVersion() {
@@ -788,7 +708,7 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
 
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
-    const char *Producer, bool isOptimized, const char *Flags,
+    const char *Producer, uint8_t isOptimized, const char *Flags,
     unsigned RuntimeVer, const char *SplitName) {
   auto *File = unwrapDI<DIFile>(FileRef);
 
@@ -798,7 +718,7 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
 
 LLVMMetadataRef
 LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
-                            const char *Directory) {
+                        const char *Directory) {
   return wrap(unwrap(Builder)->createFile(Filename, Directory));
 }
 
@@ -813,8 +733,8 @@ LLVMDIBuilderCreateSubroutineType(LLVMDIBuilderRef Builder,
 LLVMMetadataRef LLVMDIBuilderCreateFunction(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, bool IsLocalToUnit, bool IsDefinition,
-    unsigned ScopeLine, LLVMDIFlags Flags, bool IsOptimized,
+    LLVMMetadataRef Ty, uint8_t IsLocalToUnit, uint8_t IsDefinition,
+    unsigned ScopeLine, LLVMDIFlags Flags, uint8_t IsOptimized,
     LLVMValueRef Fn, LLVMMetadataRef TParam, LLVMMetadataRef Decl) {
     DITemplateParameterArray TParams =
       DITemplateParameterArray(unwrap<MDTuple>(TParam));
@@ -907,7 +827,7 @@ LLVMMetadataRef
 LLVMDIBuilderCreateGlobalVariableExpression(
     LLVMDIBuilderRef Builder,  LLVMMetadataRef Scope, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNumber,
-    LLVMMetadataRef Ty, bool isLocalToUnit, LLVMDIExpressionRef Expr) {
+    LLVMMetadataRef Ty, uint8_t isLocalToUnit, LLVMDIExpressionRef Expr) {
   auto E = unwrap(Builder)->createGlobalVariableExpression(
     unwrapDI<DIDescriptor>(Scope), Name, LinkageName, unwrapDI<DIFile>(File),
     LineNumber, unwrapDI<DIType>(Ty), isLocalToUnit);
@@ -917,7 +837,7 @@ LLVMDIBuilderCreateGlobalVariableExpression(
 LLVMMetadataRef LLVMDIBuilderCreateVariable(
     LLVMDIBuilderRef Builder, unsigned Tag, LLVMMetadataRef Scope,
     const char *Name, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, bool AlwaysPreserve, LLVMDIFlags Flags,
+    LLVMMetadataRef Ty, uint8_t AlwaysPreserve, LLVMDIFlags Flags,
     unsigned ArgNo, uint32_t AlignInBits) {
   if (Tag == 0x100) { // DW_TAG_auto_variable
     return wrap(unwrap(Builder)->createAutoVariable(
@@ -950,7 +870,7 @@ LLVMDIBuilderCreateVectorType(LLVMDIBuilderRef Builder, uint64_t Size,
 
 LLVMMetadataRef
 LLVMDIBuilderGetOrCreateSubrange(LLVMDIBuilderRef Builder, int64_t Lo,
-                                     int64_t Count) {
+                                 int64_t Count) {
   return wrap(unwrap(Builder)->getOrCreateSubrange(Lo, Count));
 }
 
