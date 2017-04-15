@@ -552,6 +552,11 @@ DIBuilder::getOrCreateMacroArray(ArrayRef<Metadata *> Elements) {
   return MDTuple::get(VMContext, Elements);
 }
 
+DITemplateParameterArray
+DIBuilder::getOrCreateTemplateParameterArray(ArrayRef<Metadata *> Elements) {
+  return MDTuple::get(VMContext, Elements);
+}
+
 DITypeRefArray DIBuilder::getOrCreateTypeArray(ArrayRef<Metadata *> Elements) {
   SmallVector<llvm::Metadata *, 16> Elts;
   for (unsigned i = 0, e = Elements.size(); i != e; ++i) {

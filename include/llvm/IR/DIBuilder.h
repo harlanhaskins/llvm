@@ -476,6 +476,10 @@ namespace llvm {
     /// Get a DIMacroNodeArray, create one if required.
     DIMacroNodeArray getOrCreateMacroArray(ArrayRef<Metadata *> Elements);
 
+    /// Get a DITemplateParameterArray, create one if required.
+    DITemplateParameterArray
+    getOrCreateTemplateParameterArray(ArrayRef<Metadata *> Elements);
+
     /// Get a DITypeRefArray, create one if required.
     DITypeRefArray getOrCreateTypeArray(ArrayRef<Metadata *> Elements);
 
