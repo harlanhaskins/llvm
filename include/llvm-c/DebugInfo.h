@@ -68,6 +68,35 @@ LLVMMetadataRef LLVMDIBuilderCreateFunction(
     LLVMValueRef Fn, LLVMMetadataRef TParam, LLVMMetadataRef Decl);
 
 LLVMMetadataRef
+LLVMDIBuilderCreateArtificialType(LLVMDIBuilderRef Builder,
+                                  LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateAutoVariable(LLVMDIBuilderRef Builder,
+                                LLVMMetadataRef Scope, const char *Name,
+                                LLVMMetadataRef File, unsigned LineNo,
+                                LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateBitFieldMemberType(LLVMDIBuilderRef Builder,
+                                      LLVMMetadataRef Scope,
+                                      const char *Name, LLVMMetadataRef File,
+                                      unsigned LineNumber, uint64_t SizeInBits,
+                                      uint64_t OffsetInBits,
+                                      uint64_t StorageOffsetInBits,
+                                      LLVMDIFlags Flags, LLVMMetadataRef Type);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder, unsigned Tag,
+                               const char *Name, LLVMMetadataRef Scope,
+                               LLVMMetadataRef File, unsigned Line);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateFriend(LLVMDIBuilderRef Builder,
+                          LLVMMetadataRef Type,
+                          LLVMMetadataRef FriendType);
+
+LLVMMetadataRef
 LLVMDIBuilderCreateBasicType(LLVMDIBuilderRef Builder, const char *Name,
                              uint64_t SizeInBits, unsigned Encoding);
 
@@ -96,6 +125,18 @@ LLVMMetadataRef
 LLVMDIBuilderCreateLexicalBlockFile(LLVMDIBuilderRef Builder,
                                     LLVMMetadataRef Scope,
                                     LLVMMetadataRef File);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateConstantValueExpression(LLVMDIBuilderRef Builder,
+                                           uint64_t Val);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateFragmentExpression(LLVMDIBuilderRef Builder,
+                                      unsigned OffsetInBits,
+                                      unsigned SizeInBits);
+LLVMMetadataRef
+LLVMDIBuilderCreateExpression(LLVMDIBuilderRef Builder, int64_t *Addrs,
+                              unsigned NumAddrs);
 
 LLVMMetadataRef LLVMDIBuilderCreateStaticVariable(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Context, const char *Name,
@@ -131,6 +172,18 @@ LLVMValueRef LLVMDIBuilderInsertDeclareAtEnd(
     LLVMDIBuilderRef Builder, LLVMValueRef V, LLVMMetadataRef VarInfo,
     int64_t *AddrOps, unsigned AddrOpsCount, LLVMValueRef DL,
     LLVMBasicBlockRef InsertAtEnd);
+
+LLVMValueRef
+LLVMDIBuilderInsertDbgValueIntrinsicAtEnd(
+    LLVMDIBuilderRef Builder, LLVMValueRef Val, uint64_t Offset,
+    LLVMMetadataRef VarInfo, LLVMMetadataRef Expr, LLVMMetadataRef Loc,
+    LLVMBasicBlockRef InsertAtEnd);
+
+LLVMValueRef
+LLVMDIBuilderInsertDbgValueIntrinsicBefore(
+    LLVMDIBuilderRef Builder, LLVMValueRef Val, uint64_t Offset,
+    LLVMMetadataRef VarInfo, LLVMMetadataRef Expr, LLVMMetadataRef Loc,
+    LLVMValueRef InsertBefore);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateEnumerator(LLVMDIBuilderRef Builder,
