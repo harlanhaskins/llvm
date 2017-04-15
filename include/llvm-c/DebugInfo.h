@@ -40,6 +40,12 @@ void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder);
 
 void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 
+LLVMMetadataRef LLVMDIBuilderCreateClassType(LLVMDIBuilderRef Builder,
+    LLVMMetadataRef Scope, const char *Name, LLVMMetadataRef File,
+    unsigned LineNumber, uint64_t SizeInBits, uint32_t AlignInBits,
+    uint64_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef DerivedFrom,
+    LLVMMetadataRef Elements);
+
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
     const char *Producer, uint8_t isOptimized, const char *Flags,
