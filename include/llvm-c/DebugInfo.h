@@ -133,6 +133,19 @@ LLVMDIBuilderCreateFriend(LLVMDIBuilderRef Builder,
                           LLVMMetadataRef FriendType);
 
 LLVMMetadataRef
+LLVMDIBuilderCreateObjCIVar(
+    LLVMDIBuilderRef Builder, const char *Name, LLVMMetadataRef File,
+    unsigned Line, uint64_t SizeInBits, uint32_t AlignInBits,
+    uint32_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef Type,
+    LLVMMetadataRef PropertyOrNull);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateObjCProperty(
+    LLVMDIBuilderRef Builder, const char *Name, LLVMMetadataRef File,
+    unsigned Line, const char *GetterName, const char *SetterName,
+    unsigned PropertyAttributes, LLVMMetadataRef Type);
+
+LLVMMetadataRef
 LLVMDIBuilderCreateBasicType(LLVMDIBuilderRef Builder, const char *Name,
                              uint64_t SizeInBits, unsigned Encoding);
 
@@ -186,6 +199,19 @@ LLVMMetadataRef
 LLVMDIBuilderCreateReplaceableCompositeType(
     LLVMDIBuilderRef Builder, unsigned Tag, const char *Name,
     LLVMMetadataRef Scope, LLVMMetadataRef File, unsigned Line);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTmpFunctionFwdDecl(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    const char *LinkageName, LLVMMetadataRef File, unsigned Line,
+    LLVMMetadataRef Type, uint8_t IsLocalToUnit, uint8_t IsDefinition,
+    unsigned ScopeLine);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateUnspecifiedParameter(LLVMDIBuilderRef Builder);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateUnspecifiedType(LLVMDIBuilderRef Builder, const char *Name);
 
 LLVMMetadataRef LLVMDIBuilderCreateLexicalBlock(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
@@ -280,8 +306,17 @@ LLVMMetadataRef LLVMDIBuilderCreateUnionType(
 
 LLVMMetadataRef LLVMDIBuilderCreateTemplateTypeParameter(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
-    LLVMMetadataRef Ty, LLVMMetadataRef File, unsigned LineNo,
-    unsigned ColumnNo);
+    LLVMMetadataRef Ty);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTemplateValueParameter(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    LLVMMetadataRef Type, LLVMValueRef ConstantValueOrNull);
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTemplateTemplateParameter(
+     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+     LLVMMetadataRef Type, const char *Str);
 
 LLVMMetadataRef
 LLVMDIBuilderCreateNameSpace(LLVMDIBuilderRef Builder,

@@ -896,6 +896,28 @@ LLVMDIBuilderCreateReferenceType(LLVMDIBuilderRef Builder, unsigned Tag,
 }
 
 LLVMMetadataRef
+LLVMDIBuilderCreateObjCIVar(
+    LLVMDIBuilderRef Builder, const char *Name, LLVMMetadataRef File,
+    unsigned Line, uint64_t SizeInBits, uint32_t AlignInBits,
+    uint32_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef Type,
+    LLVMMetadataRef PropertyOrNull) {
+  return wrap(unwrap(Builder)->createObjCIVar(Name, unwrapDI<DIFile>(File),
+                  Line, SizeInBits, AlignInBits, OffsetInBits, fromC(Flags),
+                  unwrapDI<DIType>(Type),
+                  PropertyOrNull ? unwrap<MDNode>(PropertyOrNull) : nullptr));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateObjCProperty(
+    LLVMDIBuilderRef Builder, const char *Name, LLVMMetadataRef File,
+    unsigned Line, const char *GetterName, const char *SetterName,
+    unsigned PropertyAttributes, LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createObjCProperty(Name, unwrapDI<DIFile>(File),
+                  Line, GetterName, SetterName, PropertyAttributes,
+                  unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
 LLVMDIBuilderCreateReplaceableCompositeType(
     LLVMDIBuilderRef Builder, unsigned Tag, const char *Name,
     LLVMMetadataRef Scope, LLVMMetadataRef File, unsigned Line) {
@@ -903,7 +925,6 @@ LLVMDIBuilderCreateReplaceableCompositeType(
                   Tag, Name, unwrapDI<DIScope>(Scope),
                   unwrapDI<DIFile>(File), Line));
 }
-
 
 LLVMMetadataRef
 LLVMDIBuilderCreateStaticMemberType(
@@ -920,6 +941,56 @@ LLVMMetadataRef
 LLVMDIBuilderCreateObjectPointerType(LLVMDIBuilderRef Builder,
                                      LLVMMetadataRef Type) {
   return wrap(unwrap(Builder)->createObjectPointerType(unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTmpFunctionFwdDecl(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    const char *LinkageName, LLVMMetadataRef File, unsigned Line,
+    LLVMMetadataRef Type, uint8_t IsLocalToUnit, uint8_t IsDefinition,
+    unsigned ScopeLine) {
+  return wrap(unwrap(Builder)->createTempFunctionFwdDecl(
+                  unwrapDI<DIScope>(Scope), Name, LinkageName,
+                  unwrapDI<DIFile>(File), Line,
+                  unwrapDI<DISubroutineType>(Type), IsLocalToUnit,
+                  IsDefinition, ScopeLine));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateUnspecifiedParameter(LLVMDIBuilderRef Builder) {
+  return wrap(unwrap(Builder)->createUnspecifiedParameter());
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTemplateTypeParameter(LLVMDIBuilderRef Builder,
+                                         LLVMMetadataRef Scope,
+                                         const char *Name,
+                                         LLVMMetadataRef Type) {
+  return wrap(unwrap(Builder)->createTemplateTypeParameter(
+                  unwrapDI<DIScope>(Scope), Name, unwrapDI<DIType>(Type)));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateUnspecifiedType(LLVMDIBuilderRef Builder, const char *Name) {
+  return wrap(unwrap(Builder)->createUnspecifiedType(Name));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTemplateValueParameter(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    LLVMMetadataRef Type, LLVMValueRef ConstantValueOrNull) {
+    return wrap(unwrap(Builder)->createTemplateValueParameter(
+                    unwrapDI<DIScope>(Scope), Name, unwrapDI<DIType>(Type),
+                    dyn_cast_or_null<Constant>(unwrap(ConstantValueOrNull))));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTemplateTemplateParameter(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    LLVMMetadataRef Type, const char *Str) {
+  return wrap(unwrap(Builder)->createTemplateTemplateParameter(
+                  unwrapDI<DIScope>(Scope), Name, unwrapDI<DIType>(Type),
+                  Str));
 }
 
 LLVMMetadataRef
@@ -1134,14 +1205,6 @@ LLVMMetadataRef LLVMDIBuilderCreateUnionType(
   return wrap(unwrap(Builder)->createUnionType(
       unwrapDI<DIScope>(Scope), Name, unwrapDI<DIFile>(File), LineNumber,
       SizeInBits, AlignInBits, fromC(Flags), Elts, RunTimeLang, UniqueId));
-}
-
-LLVMMetadataRef LLVMDIBuilderCreateTemplateTypeParameter(
-    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
-    LLVMMetadataRef Ty, LLVMMetadataRef File, unsigned LineNo,
-    unsigned ColumnNo) {
-  return wrap(unwrap(Builder)->createTemplateTypeParameter(
-      unwrapDI<DIScope>(Scope), Name, unwrapDI<DIType>(Ty)));
 }
 
 LLVMMetadataRef
