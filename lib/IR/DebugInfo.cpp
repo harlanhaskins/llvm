@@ -687,8 +687,20 @@ uint32_t LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
 }
 
-LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M) {
-  return wrap(new DIBuilder(*unwrap(M)));
+unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef M) {
+  return getDebugMetadataVersionFromModule(*unwrap(M));
+}
+
+uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef M) {
+  return StripDebugInfo(*unwrap(M));
+}
+
+uint8_t LLVMStripFunctionDebugInfo(LLVMValueRef F) {
+  return stripDebugInfo(*unwrap<Function>(F));
+}
+
+LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M, uint8_t AllowUnresolved) {
+  return wrap(new DIBuilder(*unwrap(M), AllowUnresolved));
 }
 
 void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder) {
@@ -702,24 +714,31 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
 LLVMMetadataRef LLVMDIBuilderCreateClassType(LLVMDIBuilderRef Builder,
     LLVMMetadataRef Scope, const char *Name, LLVMMetadataRef File,
     unsigned LineNumber, uint64_t SizeInBits, uint32_t AlignInBits,
-    uint64_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef DerivedFrom,
-    LLVMMetadataRef *Elements, unsigned NumElements) {
-  auto Elts = unwrap(Builder)->getOrCreateArray({unwrap(Elements),
-                                                 NumElements});
+    uint64_t OffsetInBits, LLVMDIFlags Flags, LLVMMetadataRef *Elements,
+    unsigned NumElements, LLVMMetadataRef DerivedFrom,
+    LLVMMetadataRef TemplateParamsNode) {
+  auto Elts = unwrap(Builder)->getOrCreateArray(
+                  {unwrap(Elements), NumElements});
   return wrap(unwrap(Builder)->createClassType(
             unwrapDI<DIScope>(Scope), Name, unwrapDI<DIFile>(File),
             LineNumber, SizeInBits, AlignInBits, OffsetInBits, fromC(Flags),
-            unwrapDI<DIType>(DerivedFrom), Elts));
+            unwrapDI<DIType>(DerivedFrom), Elts, nullptr,
+            unwrap<MDNode>(TemplateParamsNode)));
 }
 
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
-    LLVMDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
-    const char *Producer, uint8_t isOptimized, const char *Flags,
-    unsigned RuntimeVer, const char *SplitName) {
+    LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
+    LLVMMetadataRef FileRef, const char *Producer, uint8_t isOptimized,
+    const char *Flags, unsigned RuntimeVer, const char *SplitName,
+    LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
+    uint8_t DebugInfoForProfiling) {
   auto *File = unwrapDI<DIFile>(FileRef);
 
   return wrap(unwrap(Builder)->createCompileUnit(
-           Lang, File, Producer, isOptimized, Flags, RuntimeVer, SplitName));
+           static_cast<unsigned>(Lang), File, Producer,
+           isOptimized, Flags, RuntimeVer, SplitName,
+           static_cast<DICompileUnit::DebugEmissionKind>(Kind), DWOId,
+           SplitDebugInlining, DebugInfoForProfiling));
 }
 
 LLVMMetadataRef
@@ -745,9 +764,9 @@ LLVMMetadataRef LLVMDIBuilderCreateFunction(
     unsigned ScopeLine, LLVMDIFlags Flags, uint8_t IsOptimized,
     LLVMValueRef Fn, LLVMMetadataRef *TemplateParams,
     unsigned NumTemplateParams, LLVMMetadataRef Decl) {
-  auto TParams = unwrap(Builder)->getOrCreateTemplateParameterArray(
-                      {unwrap(TemplateParams), NumTemplateParams});
   auto DIB = unwrap(Builder);
+  auto TParams = DIB->getOrCreateTemplateParameterArray(
+                      {unwrap(TemplateParams), NumTemplateParams});
   DISubprogram *Sub = DIB->createFunction(
       unwrapDI<DIScope>(Scope), Name, LinkageName, unwrapDI<DIFile>(File),
       LineNo, unwrapDI<DISubroutineType>(Ty), IsLocalToUnit, IsDefinition,
@@ -755,6 +774,26 @@ LLVMMetadataRef LLVMDIBuilderCreateFunction(
       unwrapDI<DISubprogram>(Decl));
   unwrap<Function>(Fn)->setSubprogram(Sub);
   return wrap(Sub);
+}
+
+
+
+LLVMMetadataRef
+LLVMDIBuilderCreateTempFunctionFwdDecl(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
+    LLVMMetadataRef Ty, uint8_t IsLocalToUnit, uint8_t IsDefinition,
+    unsigned ScopeLine, LLVMDIFlags Flags, uint8_t IsOptimized,
+    LLVMValueRef Fn, LLVMMetadataRef *TemplateParams,
+    unsigned NumTemplateParams, LLVMMetadataRef Decl) {
+  auto DIB = unwrap(Builder);
+  auto TParams = DIB->getOrCreateTemplateParameterArray(
+                      {unwrap(TemplateParams), NumTemplateParams});
+  return wrap(DIB->createTempFunctionFwdDecl(
+                unwrapDI<DIScope>(Scope), Name, LinkageName,
+                unwrapDI<DIFile>(File), LineNo, unwrapDI<DISubroutineType>(Ty),
+                IsLocalToUnit, IsDefinition, ScopeLine, fromC(Flags),
+                IsOptimized, TParams, unwrapDI<DISubprogram>(Decl)));
 }
 
 LLVMMetadataRef
@@ -767,12 +806,15 @@ LLVMMetadataRef
 LLVMDIBuilderCreateAutoVariable(LLVMDIBuilderRef Builder,
                                 LLVMMetadataRef Scope, const char *Name,
                                 LLVMMetadataRef File, unsigned LineNo,
-                                LLVMMetadataRef Type) {
+                                LLVMMetadataRef Type, uint8_t AlwaysPreserve,
+                                LLVMDIFlags Flags, uint32_t AlignInBits) {
   return wrap(unwrap(Builder)->createAutoVariable(unwrapDI<DIScope>(Scope),
                                                   Name,
                                                   unwrapDI<DIFile>(File),
                                                   LineNo,
-                                                  unwrapDI<DIType>(Type)));
+                                                  unwrapDI<DIType>(Type),
+                                                  AlwaysPreserve, fromC(Flags),
+                                                  AlignInBits));
 }
 
 LLVMMetadataRef
@@ -801,16 +843,21 @@ LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder, unsigned Tag,
 }
 
 LLVMMetadataRef
-LLVMDIBuilderCreateMethod(LLVMDIBuilderRef Builder, LLVMMetadataRef Scope,
-                          const char *Name, const char *LinkageName,
-                          LLVMMetadataRef File, unsigned LineNumber,
-                          LLVMMetadataRef FuncTy, uint8_t LocalToUnit,
-                          uint8_t IsDefinition) {
+LLVMDIBuilderCreateMethod(
+    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+    const char *LinkageName, LLVMMetadataRef File, unsigned LineNumber,
+    LLVMMetadataRef FuncTy, LLVMDIFlags Flags, uint8_t IsLocalToUnit,
+    uint8_t IsDefinition, uint8_t IsOptimized,
+    LLVMMetadataRef *TemplateParameters, unsigned NumTemplateParameters) {
+  auto TParams = unwrap(Builder)->getOrCreateTemplateParameterArray(
+                     {unwrap(TemplateParameters), NumTemplateParameters});
   return wrap(unwrap(Builder)->createMethod(unwrapDI<DIScope>(Scope),
                                             Name, LinkageName,
                                             unwrapDI<DIFile>(File), LineNumber,
                                             unwrapDI<DISubroutineType>(FuncTy),
-                                            LocalToUnit, IsDefinition));
+                                            IsLocalToUnit, IsDefinition,
+                                            0, 0, 0, nullptr, fromC(Flags),
+                                            IsOptimized, TParams));
 }
 
 LLVMMetadataRef
@@ -852,10 +899,13 @@ LLVMMetadataRef
 LLVMDIBuilderCreateMemberPointerType(LLVMDIBuilderRef Builder,
                                      LLVMMetadataRef PointeeType,
                                      LLVMMetadataRef ClassType,
-                                     uint64_t SizeInBits) {
+                                     uint64_t SizeInBits,
+                                     uint32_t AlignInBits,
+                                     LLVMDIFlags Flags) {
   return wrap(unwrap(Builder)->createMemberPointerType(
                   unwrapDI<DIType>(PointeeType),
-                  unwrapDI<DIType>(ClassType), SizeInBits));
+                  unwrapDI<DIType>(ClassType), AlignInBits, SizeInBits,
+                  fromC(Flags)));
 }
 
 LLVMMetadataRef
@@ -875,10 +925,12 @@ LLVMDIBuilderCreateNullPtrType(LLVMDIBuilderRef Builder) {
 LLVMMetadataRef
 LLVMDIBuilderCreateParameterVariable(LLVMDIBuilderRef Builder,
     LLVMMetadataRef Scope, const char *Name, unsigned ArgNum,
-    LLVMMetadataRef File, unsigned LineNum, LLVMMetadataRef Type) {
+    LLVMMetadataRef File, unsigned LineNum, LLVMMetadataRef Type,
+    uint8_t AlwaysPreserve, LLVMDIFlags Flags) {
   return wrap(unwrap(Builder)->createParameterVariable(
                   unwrapDI<DIScope>(Scope), Name, ArgNum,
-                  unwrapDI<DIFile>(File), LineNum, unwrapDI<DIType>(Type)));
+                  unwrapDI<DIFile>(File), LineNum, unwrapDI<DIType>(Type),
+                  AlwaysPreserve, fromC(Flags)));
 }
 
 LLVMMetadataRef
@@ -930,30 +982,17 @@ LLVMMetadataRef
 LLVMDIBuilderCreateStaticMemberType(
     LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
     LLVMMetadataRef File, unsigned LineNumber, LLVMMetadataRef Type,
-    LLVMDIFlags Flags, LLVMValueRef ConstantVal) {
+    LLVMDIFlags Flags, LLVMValueRef ConstantVal, uint32_t AlignInBits) {
   return wrap(unwrap(Builder)->createStaticMemberType(
                   unwrapDI<DIScope>(Scope), Name, unwrapDI<DIFile>(File),
                   LineNumber, unwrapDI<DIType>(Type), fromC(Flags),
-                  unwrap<Constant>(ConstantVal)));
+                  unwrap<Constant>(ConstantVal), AlignInBits));
 }
 
 LLVMMetadataRef
 LLVMDIBuilderCreateObjectPointerType(LLVMDIBuilderRef Builder,
                                      LLVMMetadataRef Type) {
   return wrap(unwrap(Builder)->createObjectPointerType(unwrapDI<DIType>(Type)));
-}
-
-LLVMMetadataRef
-LLVMDIBuilderCreateTmpFunctionFwdDecl(
-    LLVMDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
-    const char *LinkageName, LLVMMetadataRef File, unsigned Line,
-    LLVMMetadataRef Type, uint8_t IsLocalToUnit, uint8_t IsDefinition,
-    unsigned ScopeLine) {
-  return wrap(unwrap(Builder)->createTempFunctionFwdDecl(
-                  unwrapDI<DIScope>(Scope), Name, LinkageName,
-                  unwrapDI<DIFile>(File), Line,
-                  unwrapDI<DISubroutineType>(Type), IsLocalToUnit,
-                  IsDefinition, ScopeLine));
 }
 
 LLVMMetadataRef
@@ -1003,7 +1042,8 @@ LLVMDIBuilderCreateFriend(LLVMDIBuilderRef Builder,
 
 LLVMMetadataRef
 LLVMDIBuilderCreateBasicType(LLVMDIBuilderRef Builder, const char *Name,
-                             uint64_t SizeInBits, unsigned Encoding) {
+                             uint64_t SizeInBits,
+                             LLVMDWARFTypeEncoding Encoding) {
   return wrap(unwrap(Builder)->createBasicType(Name, SizeInBits, Encoding));
 }
 
@@ -1090,22 +1130,6 @@ LLVMDIBuilderCreateGlobalVariableExpression(
   return wrap(E);
 }
 
-LLVMMetadataRef LLVMDIBuilderCreateVariable(
-    LLVMDIBuilderRef Builder, unsigned Tag, LLVMMetadataRef Scope,
-    const char *Name, LLVMMetadataRef File, unsigned LineNo,
-    LLVMMetadataRef Ty, uint8_t AlwaysPreserve, LLVMDIFlags Flags,
-    unsigned ArgNo, uint32_t AlignInBits) {
-  if (Tag == 0x100) { // DW_TAG_auto_variable
-    return wrap(unwrap(Builder)->createAutoVariable(
-        unwrapDI<DIScope>(Scope), Name, unwrapDI<DIFile>(File), LineNo,
-        unwrapDI<DIType>(Ty), AlwaysPreserve, fromC(Flags), AlignInBits));
-  } else {
-    return wrap(unwrap(Builder)->createParameterVariable(
-          unwrapDI<DIScope>(Scope), Name, ArgNo, unwrapDI<DIFile>(File),
-          LineNo, unwrapDI<DIType>(Ty), AlwaysPreserve, fromC(Flags)));
-  }
-}
-
 LLVMMetadataRef
 LLVMDIBuilderCreateArrayType(LLVMDIBuilderRef Builder, uint64_t Size,
                              uint32_t AlignInBits, LLVMMetadataRef Ty,
@@ -1145,14 +1169,13 @@ LLVMDIBuilderGetOrCreateArray(LLVMDIBuilderRef Builder,
 
 LLVMValueRef LLVMDIBuilderInsertDeclareAtEnd(
     LLVMDIBuilderRef Builder, LLVMValueRef V, LLVMMetadataRef VarInfo,
-    int64_t *AddrOps, unsigned AddrOpsCount, LLVMValueRef DL,
+    int64_t *AddrOps, unsigned AddrOpsCount, LLVMMetadataRef DL,
     LLVMBasicBlockRef InsertAtEnd) {
   return wrap(unwrap(Builder)->insertDeclare(
       unwrap(V), unwrap<DILocalVariable>(VarInfo),
       unwrap(Builder)->createExpression(ArrayRef<int64_t>(AddrOps,
                                                           AddrOpsCount)),
-      DebugLoc(cast<MDNode>(unwrap<MetadataAsValue>(DL)->getMetadata())),
-      unwrap(InsertAtEnd)));
+      unwrapDI<DILocation>(DL), unwrap(InsertAtEnd)));
 }
 
 LLVMValueRef
@@ -1179,7 +1202,7 @@ LLVMDIBuilderInsertDbgValueIntrinsicBefore(
 
 LLVMMetadataRef
 LLVMDIBuilderCreateEnumerator(LLVMDIBuilderRef Builder,
-                                  const char *Name, uint64_t Val) {
+                                  const char *Name, int64_t Val) {
   return wrap(unwrap(Builder)->createEnumerator(Name, Val));
 }
 
@@ -1226,15 +1249,11 @@ void LLVMDICompositeTypeSetTypeArray(LLVMDIBuilderRef Builder,
   unwrap(Builder)->replaceArrays(Tmp, Tys);
 }
 
-LLVMValueRef
-LLVMDIBuilderCreateDebugLocation(LLVMContextRef ContextRef, unsigned Line,
+LLVMMetadataRef
+LLVMDIBuilderCreateDebugLocation(LLVMContextRef Ctx, unsigned Line,
                                  unsigned Column, LLVMMetadataRef Scope,
                                  LLVMMetadataRef InlinedAt) {
-  LLVMContext &Context = *unwrap(ContextRef);
-
-  DebugLoc DebugLoc = DebugLoc::get(Line, Column, unwrapDI<MDNode>(Scope),
-                                     unwrapDI<MDNode>(InlinedAt));
-
-  return wrap(MetadataAsValue::get(Context, DebugLoc.getAsMDNode()));
+  return wrap(DILocation::get(*unwrap(Ctx), Line, Column, unwrap(Scope),
+                              unwrap(InlinedAt)));
 }
 }
