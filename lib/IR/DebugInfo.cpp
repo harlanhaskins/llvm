@@ -665,15 +665,6 @@ unsigned llvm::getDebugMetadataVersionFromModule(const Module &M) {
 // LLVM C API implementations.
 //===----------------------------------------------------------------------===//
 
-namespace llvm {
-DEFINE_ISA_CONVERSION_FUNCTIONS(DIBuilder, LLVMDIBuilderRef)
-DEFINE_ISA_CONVERSION_FUNCTIONS(Metadata, LLVMMetadataRef)
-
-inline Metadata **unwrap(LLVMMetadataRef *Vals) {
-  return reinterpret_cast<Metadata **>(Vals);
-}
-}
-
 template <typename DIT> DIT *unwrapDI(LLVMMetadataRef Ref) {
   return (DIT *)(Ref ? unwrap<MDNode>(Ref) : nullptr);
 }
@@ -1123,7 +1114,7 @@ LLVMMetadataRef
 LLVMDIBuilderCreateGlobalVariableExpression(
     LLVMDIBuilderRef Builder,  LLVMMetadataRef Scope, const char *Name,
     const char *LinkageName, LLVMMetadataRef File, unsigned LineNumber,
-    LLVMMetadataRef Ty, uint8_t isLocalToUnit, LLVMDIExpressionRef Expr) {
+    LLVMMetadataRef Ty, uint8_t isLocalToUnit, LLVMMetadataRef Expr) {
   auto E = unwrap(Builder)->createGlobalVariableExpression(
     unwrapDI<DIScope>(Scope), Name, LinkageName, unwrapDI<DIFile>(File),
     LineNumber, unwrapDI<DIType>(Ty), isLocalToUnit);
