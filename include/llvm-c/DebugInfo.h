@@ -13,14 +13,6 @@
 
 #include "llvm-c/Core.h"
 
-/// Represents a piece of debug metadata attached to a Value.
-/// @see llvm::Metadata
-typedef struct LLVMOpaqueMetadata *LLVMMetadataRef;
-
-/// Represents a builder that can create debug metadata.
-/// @see llvm::DIBuilder
-typedef struct LLVMOpaqueDIBuilder *LLVMDIBuilderRef;
-
 #ifdef __cplusplus
 extern "C" {
 #endif

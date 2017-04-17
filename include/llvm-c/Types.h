@@ -76,6 +76,13 @@ typedef struct LLVMOpaqueType *LLVMTypeRef;
 typedef struct LLVMOpaqueValue *LLVMValueRef;
 
 /**
+ * Represents metadata attached to values in LLVM IR.
+ *
+ * This models llvm::Metadata
+ */
+typedef struct LLVMOpaqueMetadata *LLVMMetadataRef;
+
+/**
  * Represents a basic block of instructions in LLVM IR.
  *
  * This models llvm::BasicBlock.
