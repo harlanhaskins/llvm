@@ -16,6 +16,10 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/None.h"
+#include "llvm-c/DebugInfo.h"
+#include "llvm/IR/DebugInfo.h"
+#include "LLVMContextImpl.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -691,4 +695,61 @@ void Instruction::applyMergedLocation(const DILocation *LocA,
   }
   setDebugLoc(DILocation::get(
       Result->getContext(), 0, 0, Result->getScope(), Result->getInlinedAt()));
+}
+
+//===----------------------------------------------------------------------===//
+// LLVM C API implementations.
+//===----------------------------------------------------------------------===//
+
+template <typename DIT> DIT *unwrapDI(LLVMMetadataRef Ref) {
+  return (DIT *)(Ref ? unwrap<MDNode>(Ref) : nullptr);
+}
+
+uint32_t LLVMDebugMetadataVersion() {
+  return DEBUG_METADATA_VERSION;
+}
+
+unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef M) {
+  return getDebugMetadataVersionFromModule(*unwrap(M));
+}
+
+uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef M) {
+  return StripDebugInfo(*unwrap(M));
+}
+
+void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder) {
+  delete unwrap(Builder);
+}
+
+void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
+  unwrap(Builder)->finalize();
+}
+
+LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
+    LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
+    LLVMMetadataRef FileRef, const char *Producer, uint8_t isOptimized,
+    const char *Flags, unsigned RuntimeVer, const char *SplitName,
+    LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
+    uint8_t DebugInfoForProfiling) {
+  auto *File = unwrapDI<DIFile>(FileRef);
+
+  return wrap(unwrap(Builder)->createCompileUnit(
+                 static_cast<unsigned>(Lang), File, Producer,
+                 isOptimized, Flags, RuntimeVer, SplitName,
+                 static_cast<DICompileUnit::DebugEmissionKind>(Kind), DWOId,
+                 SplitDebugInlining, DebugInfoForProfiling));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
+                        const char *Directory) {
+  return wrap(unwrap(Builder)->createFile(Filename, Directory));
+}
+
+LLVMMetadataRef
+LLVMDIBuilderCreateDebugLocation(LLVMContextRef Ctx, unsigned Line,
+                                 unsigned Column, LLVMMetadataRef Scope,
+                                 LLVMMetadataRef InlinedAt) {
+  return wrap(DILocation::get(*unwrap(Ctx), Line, Column, unwrap(Scope),
+                              unwrap(InlinedAt)));
 }
