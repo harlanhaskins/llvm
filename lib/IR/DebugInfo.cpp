@@ -727,23 +727,28 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
 
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
-    LLVMMetadataRef FileRef, const char *Producer, uint8_t isOptimized,
-    const char *Flags, unsigned RuntimeVer, const char *SplitName,
+    LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
+    uint8_t isOptimized, const char *Flags, uint64_t FlagsLen,
+    unsigned RuntimeVer, const char *SplitName, uint64_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
     uint8_t DebugInfoForProfiling) {
   auto *File = unwrapDI<DIFile>(FileRef);
 
   return wrap(unwrap(Builder)->createCompileUnit(
-                 static_cast<unsigned>(Lang), File, Producer,
-                 isOptimized, Flags, RuntimeVer, SplitName,
+                 static_cast<unsigned>(Lang), File,
+                 StringRef(Producer, ProducerLen), isOptimized,
+                 StringRef(Flags, FlagsLen), RuntimeVer,
+                 StringRef(SplitName, SplitNameLen),
                  static_cast<DICompileUnit::DebugEmissionKind>(Kind), DWOId,
                  SplitDebugInlining, DebugInfoForProfiling));
 }
 
 LLVMMetadataRef
 LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
-                        const char *Directory) {
-  return wrap(unwrap(Builder)->createFile(Filename, Directory));
+                        uint64_t FilenameLen, const char *Directory,
+                        uint64_t DirectoryLen) {
+  return wrap(unwrap(Builder)->createFile(StringRef(Filename, FilenameLen),
+                                          StringRef(Directory, DirectoryLen)));
 }
 
 LLVMMetadataRef

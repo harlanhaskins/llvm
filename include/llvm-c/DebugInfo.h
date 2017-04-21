@@ -31,7 +31,8 @@ typedef enum {
 
 /// Source languages known by DWARF.
 typedef enum {
-#define HANDLE_DW_LANG(ID, NAME, VERSION, VENDOR) LLVMDWARFSourceLanguage##NAME = ID,
+#define HANDLE_DW_LANG(ID, NAME, VERSION, VENDOR) \
+    LLVMDWARFSourceLanguage##NAME = ID,
     #include "llvm/Support/Dwarf.def"
 } LLVMDWARFSourceLanguage;
 
@@ -75,16 +76,19 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 /// \param Producer      Identify the producer of debugging information
 ///                      and code.  Usually this is a compiler
 ///                      version string.
+/// \param ProducerLen   The length of the C string passed to \c Producer.
 /// \param isOptimized   A boolean flag which indicates whether optimization
 ///                      is enabled or not.
 /// \param Flags         This string lists command line options. This
 ///                      string is directly embedded in debug info
 ///                      output which may be used by a tool
 ///                      analyzing generated debugging information.
+/// \param FlagsLen      The length of the C string passed to \c Flags.
 /// \param RuntimeVer    This indicates runtime version for languages like
 ///                      Objective-C.
 /// \param SplitName     The name of the file that we'll split debug info
 ///                      out into.
+/// \param SplitNameLen  The length of the C string passed to \c SplitName.
 /// \param Kind          The kind of debug information to generate.
 /// \param DWOId         The DWOId if this is a split skeleton compile unit.
 /// \param SplitDebugInlining    Whether to emit inline debug info.
@@ -92,18 +96,22 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 ///                              profile collection.
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
-    LLVMMetadataRef FileRef, const char *Producer, uint8_t isOptimized,
-    const char *Flags, unsigned RuntimeVer, const char *SplitName,
+    LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
+    uint8_t isOptimized, const char *Flags, uint64_t FlagsLen,
+    unsigned RuntimeVer, const char *SplitName, uint64_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
     uint8_t DebugInfoForProfiling);
 
 /// Create a file descriptor to hold debugging information for a file.
-/// \param Builder   The DIBuilder.
-/// \param Filename  File name.
-/// \param Directory Directory.
+/// \param Builder      The DIBuilder.
+/// \param Filename     File name.
+/// \param FilenameLen  The length of the C string passed to \c Filename.
+/// \param Directory    Directory.
+/// \param DirectoryLen The length of the C string passed to \c Directory.
 LLVMMetadataRef
 LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
-                        const char *Directory);
+                        uint64_t FilenameLen, const char *Directory,
+                        uint64_t DirectoryLen);
 
 /// Creates a new DebugLocation that describes a source location.
 /// \param Line The line in the source file.
