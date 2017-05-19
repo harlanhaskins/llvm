@@ -705,11 +705,11 @@ uint32_t LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
 }
 
-LLVMDIBuilderRef LLVMDIBuilderCreateDisallowUnresolved(LLVMModuleRef M) {
+LLVMDIBuilderRef LLVMCreateDIBuilderDisallowUnresolved(LLVMModuleRef M) {
   return wrap(new DIBuilder(*unwrap(M), false));
 }
 
-LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M) {
+LLVMDIBuilderRef LLVMCreateDIBuilder(LLVMModuleRef M) {
   return wrap(new DIBuilder(*unwrap(M)));
 }
 
@@ -721,7 +721,7 @@ uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef M) {
   return StripDebugInfo(*unwrap(M));
 }
 
-void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder) {
+void LLVMDisposeDIBuilder(LLVMDIBuilderRef Builder) {
   delete unwrap(Builder);
 }
 

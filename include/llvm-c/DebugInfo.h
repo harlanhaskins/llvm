@@ -58,16 +58,16 @@ uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef Module);
 
 /// Construct a builder for a module, and do not allow for unresolved nodes
 /// attached to the module.
-LLVMDIBuilderRef LLVMDIBuilderCreateDisallowUnresolved(LLVMModuleRef M);
+LLVMDIBuilderRef LLVMCreateDIBuilderDisallowUnresolved(LLVMModuleRef M);
 
 /// Construct a builder for a module and collect unresolved nodes attached
 /// to the module in order to resolve cycles during a call to
 /// \c LLVMDIBuilderFinalize.
-LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M);
+LLVMDIBuilderRef LLVMCreateDIBuilder(LLVMModuleRef M);
 
 /// Deallocates the DIBuilder and everything it owns.
 /// @note You must call \c LLVMDIBuilderFinalize before this
-void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder);
+void LLVMDisposeDIBuilder(LLVMDIBuilderRef Builder);
 
 /// Construct any deferred debug info descriptors.
 void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
