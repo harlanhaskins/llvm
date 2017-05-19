@@ -23,7 +23,7 @@ int llvm_test_dibuilder() {
   LLVMMetadataRef File = LLVMDIBuilderCreateFile(DIB, "debuginfo.c", 12,
                                                  ".", 1);
 
-  LLVMMetadataRef Unit = LLVMDIBuilderCreateCompileUnit(DIB,
+  LLVMDIBuilderCreateCompileUnit(DIB,
       LLVMDWARFSourceLanguageC, File,"llvm-c-test", 11, 0, NULL, 0, 0,
       NULL, 0, LLVMDWARFEmissionFull, 0, 0, 0);
 
