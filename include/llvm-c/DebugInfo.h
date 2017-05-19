@@ -100,7 +100,7 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 ///                              profile collection.
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
-    LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
+    LLVMMetadataRef FileRef, const char *Producer, size_t ProducerLen,
     LLVMBool isOptimized, const char *Flags, size_t FlagsLen,
     unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, LLVMBool SplitDebugInlining,
