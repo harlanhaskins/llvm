@@ -101,8 +101,8 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
     LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
-    uint8_t isOptimized, const char *Flags, uint64_t FlagsLen,
-    unsigned RuntimeVer, const char *SplitName, uint64_t SplitNameLen,
+    uint8_t isOptimized, const char *Flags, size_t FlagsLen,
+    unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
     uint8_t DebugInfoForProfiling);
 
@@ -114,8 +114,8 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
 /// \param DirectoryLen The length of the C string passed to \c Directory.
 LLVMMetadataRef
 LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
-                        uint64_t FilenameLen, const char *Directory,
-                        uint64_t DirectoryLen);
+                        size_t FilenameLen, const char *Directory,
+                        size_t DirectoryLen);
 
 /// Creates a new DebugLocation that describes a source location.
 /// \param Line The line in the source file.

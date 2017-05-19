@@ -12,13 +12,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/IR/DebugInfo.h"
+#include "llvm-c/DebugInfo.h"
+#include "LLVMContextImpl.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/None.h"
-#include "llvm-c/DebugInfo.h"
-#include "llvm/IR/DebugInfo.h"
-#include "LLVMContextImpl.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
@@ -27,6 +25,8 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/DebugInfo.h"
+#include "llvm/IR/DIBuilder.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/GVMaterializer.h"
 #include "llvm/IR/Instruction.h"
@@ -732,8 +732,8 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
     LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
-    uint8_t isOptimized, const char *Flags, uint64_t FlagsLen,
-    unsigned RuntimeVer, const char *SplitName, uint64_t SplitNameLen,
+    uint8_t isOptimized, const char *Flags, size_t FlagsLen,
+    unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
     uint8_t DebugInfoForProfiling) {
   auto File = unwrap<DIFile>(FileRef);
@@ -749,8 +749,8 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
 
 LLVMMetadataRef
 LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
-                        uint64_t FilenameLen, const char *Directory,
-                        uint64_t DirectoryLen) {
+                        size_t FilenameLen, const char *Directory,
+                        size_t DirectoryLen) {
   return wrap(unwrap(Builder)->createFile(StringRef(Filename, FilenameLen),
                                           StringRef(Directory, DirectoryLen)));
 }
