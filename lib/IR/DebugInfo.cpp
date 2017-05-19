@@ -717,7 +717,7 @@ unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef M) {
   return getDebugMetadataVersionFromModule(*unwrap(M));
 }
 
-uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef M) {
+LLVMBool LLVMStripModuleDebugInfo(LLVMModuleRef M) {
   return StripDebugInfo(*unwrap(M));
 }
 
@@ -732,10 +732,10 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder) {
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
     LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
-    uint8_t isOptimized, const char *Flags, size_t FlagsLen,
+    LLVMBool isOptimized, const char *Flags, size_t FlagsLen,
     unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
-    LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
-    uint8_t DebugInfoForProfiling) {
+    LLVMDWARFEmissionKind Kind, uint64_t DWOId, LLVMBool SplitDebugInlining,
+    LLVMBool DebugInfoForProfiling) {
   auto File = unwrap<DIFile>(FileRef);
 
   return wrap(unwrap(Builder)->createCompileUnit(

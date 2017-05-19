@@ -54,7 +54,7 @@ unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef Module);
 /// To do this, we remove all calls to the debugger intrinsics and any named
 /// metadata for debugging. We also remove debug locations for instructions.
 /// Return true if module is modified.
-uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef Module);
+LLVMBool LLVMStripModuleDebugInfo(LLVMModuleRef Module);
 
 /// Construct a builder for a module, and do not allow for unresolved nodes
 /// attached to the module.
@@ -101,10 +101,10 @@ void LLVMDIBuilderFinalize(LLVMDIBuilderRef Builder);
 LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMDIBuilderRef Builder, LLVMDWARFSourceLanguage Lang,
     LLVMMetadataRef FileRef, const char *Producer, uint64_t ProducerLen,
-    uint8_t isOptimized, const char *Flags, size_t FlagsLen,
+    LLVMBool isOptimized, const char *Flags, size_t FlagsLen,
     unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
-    LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
-    uint8_t DebugInfoForProfiling);
+    LLVMDWARFEmissionKind Kind, uint64_t DWOId, LLVMBool SplitDebugInlining,
+    LLVMBool DebugInfoForProfiling);
 
 /// Create a file descriptor to hold debugging information for a file.
 /// \param Builder      The DIBuilder.
