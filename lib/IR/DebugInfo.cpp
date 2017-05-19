@@ -701,12 +701,16 @@ void Instruction::applyMergedLocation(const DILocation *LocA,
 // LLVM C API implementations.
 //===----------------------------------------------------------------------===//
 
-template <typename DIT> DIT *unwrapDI(LLVMMetadataRef Ref) {
-  return (DIT *)(Ref ? unwrap<MDNode>(Ref) : nullptr);
-}
-
 uint32_t LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
+}
+
+LLVMDIBuilderRef LLVMDIBuilderCreateDisallowUnresolved(LLVMModuleRef M) {
+  return wrap(new DIBuilder(*unwrap(M), false));
+}
+
+LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M) {
+  return wrap(new DIBuilder(*unwrap(M)));
 }
 
 unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef M) {
@@ -732,7 +736,7 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     unsigned RuntimeVer, const char *SplitName, uint64_t SplitNameLen,
     LLVMDWARFEmissionKind Kind, uint64_t DWOId, uint8_t SplitDebugInlining,
     uint8_t DebugInfoForProfiling) {
-  auto *File = unwrapDI<DIFile>(FileRef);
+  auto File = unwrap<DIFile>(FileRef);
 
   return wrap(unwrap(Builder)->createCompileUnit(
                  static_cast<unsigned>(Lang), File,

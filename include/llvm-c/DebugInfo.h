@@ -6,12 +6,12 @@
 // License. See LICENSE.TXT for details.
 //
 //===----------------------------------------------------------------------===//
-//
-// This file declares the C API endpoints for generating DWARF Debug Info
-//
-// Note: This interface is experimental. It is *NOT* stable, and may be
-//       changed without warning.
-//
+///
+/// This file declares the C API endpoints for generating DWARF Debug Info
+///
+/// Note: This interface is experimental. It is *NOT* stable, and may be
+///       changed without warning.
+///
 //===----------------------------------------------------------------------===//
 
 #include "llvm-c/Core.h"
@@ -49,20 +49,24 @@ uint32_t LLVMDebugMetadataVersion();
 /// The version of debug metadata that's present in the provided \c Module.
 unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef Module);
 
-/// \brief Strip debug info in the module if it exists.
+/// Strip debug info in the module if it exists.
 ///
 /// To do this, we remove all calls to the debugger intrinsics and any named
 /// metadata for debugging. We also remove debug locations for instructions.
 /// Return true if module is modified.
 uint8_t LLVMStripModuleDebugInfo(LLVMModuleRef Module);
 
-/// Construct a builder for a module.
-///
-/// If \c AllowUnresolved, collect unresolved nodes attached to the module
-/// in order to resolve cycles during a call to \c LLVMDIBuilderFinalize.
-LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M, uint8_t AllowUnresolved);
+/// Construct a builder for a module, and do not allow for unresolved nodes
+/// attached to the module.
+LLVMDIBuilderRef LLVMDIBuilderCreateDisallowUnresolved(LLVMModuleRef M);
+
+/// Construct a builder for a module and collect unresolved nodes attached
+/// to the module in order to resolve cycles during a call to
+/// \c LLVMDIBuilderFinalize.
+LLVMDIBuilderRef LLVMDIBuilderCreate(LLVMModuleRef M);
 
 /// Deallocates the DIBuilder and everything it owns.
+/// @note You must call \c LLVMDIBuilderFinalize before this
 void LLVMDIBuilderDispose(LLVMDIBuilderRef Builder);
 
 /// Construct any deferred debug info descriptors.
