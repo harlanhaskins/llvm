@@ -33,7 +33,7 @@ typedef enum {
 typedef enum {
 #define HANDLE_DW_LANG(ID, NAME, VERSION, VENDOR) \
     LLVMDWARFSourceLanguage##NAME = ID,
-    #include "llvm/Support/Dwarf.def"
+    #include "llvm/BinaryFormat/Dwarf.def"
 } LLVMDWARFSourceLanguage;
 
 /// The amount of debug information to emit.
@@ -44,7 +44,7 @@ typedef enum {
 } LLVMDWARFEmissionKind;
 
 /// The current debug metadata version number.
-uint32_t LLVMDebugMetadataVersion();
+unsigned LLVMDebugMetadataVersion();
 
 /// The version of debug metadata that's present in the provided \c Module.
 unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef Module);
@@ -103,7 +103,7 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMMetadataRef FileRef, const char *Producer, size_t ProducerLen,
     LLVMBool isOptimized, const char *Flags, size_t FlagsLen,
     unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
-    LLVMDWARFEmissionKind Kind, uint64_t DWOId, LLVMBool SplitDebugInlining,
+    LLVMDWARFEmissionKind Kind, unsigned DWOId, LLVMBool SplitDebugInlining,
     LLVMBool DebugInfoForProfiling);
 
 /// Create a file descriptor to hold debugging information for a file.

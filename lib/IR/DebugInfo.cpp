@@ -701,7 +701,7 @@ void Instruction::applyMergedLocation(const DILocation *LocA,
 // LLVM C API implementations.
 //===----------------------------------------------------------------------===//
 
-uint32_t LLVMDebugMetadataVersion() {
+unsigned LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
 }
 
@@ -734,7 +734,7 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
     LLVMMetadataRef FileRef, const char *Producer, size_t ProducerLen,
     LLVMBool isOptimized, const char *Flags, size_t FlagsLen,
     unsigned RuntimeVer, const char *SplitName, size_t SplitNameLen,
-    LLVMDWARFEmissionKind Kind, uint64_t DWOId, LLVMBool SplitDebugInlining,
+    LLVMDWARFEmissionKind Kind, unsigned DWOId, LLVMBool SplitDebugInlining,
     LLVMBool DebugInfoForProfiling) {
   auto File = unwrap<DIFile>(FileRef);
 
