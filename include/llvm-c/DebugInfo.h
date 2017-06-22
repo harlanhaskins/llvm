@@ -44,7 +44,7 @@ typedef enum {
 } LLVMDWARFEmissionKind;
 
 /// The current debug metadata version number.
-unsigned LLVMDebugMetadataVersion();
+unsigned LLVMDebugMetadataVersion(void);
 
 /// The version of debug metadata that's present in the provided \c Module.
 unsigned LLVMGetModuleDebugMetadataVersion(LLVMModuleRef Module);
@@ -123,6 +123,8 @@ LLVMDIBuilderCreateFile(LLVMDIBuilderRef Builder, const char *Filename,
 /// \param Scope The scope in which the location resides.
 /// \param InlinedAt The scope where this location was inlined, if at all.
 ///                  (optional).
+/// \note If the item to which this location is attached cannot be
+///       attributed to a source line, pass 0 for the line and column.
 LLVMMetadataRef
 LLVMDIBuilderCreateDebugLocation(LLVMContextRef Ctx, unsigned Line,
                                  unsigned Column, LLVMMetadataRef Scope,
