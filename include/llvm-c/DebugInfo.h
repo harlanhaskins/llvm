@@ -19,29 +19,200 @@ extern "C" {
 
 /// Debug info flags.
 typedef enum {
-#define HANDLE_DI_FLAG(ID, NAME) LLVMDIFlag##NAME = ID,
-    #include "llvm/IR/DebugInfoFlags.def"
-    LLVMDIFlagAccessibility = LLVMDIFlagPrivate
-                            | LLVMDIFlagProtected
-                            | LLVMDIFlagPublic
+  LLVMDIFlagZero = 0,
+  LLVMDIFlagPrivate = 1,
+  LLVMDIFlagProtected = 2,
+  LLVMDIFlagPublic = 3,
+  LLVMDIFlagFwdDecl = 1 << 2,
+  LLVMDIFlagAppleBlock = 1 << 3,
+  LLVMDIFlagBlockByrefStruct = 1 << 4,
+  LLVMDIFlagVirtual = 1 << 5,
+  LLVMDIFlagArtificial = 1 << 6,
+  LLVMDIFlagExplicit = 1 << 7,
+  LLVMDIFlagPrototyped = 1 << 8,
+  LLVMDIFlagObjcClassComplete = 1 << 9,
+  LLVMDIFlagObjectPointer = 1 << 10,
+  LLVMDIFlagVector = 1 << 11,
+  LLVMDIFlagStaticMember = 1 << 12,
+  LLVMDIFlagLValueReference = 1 << 13,
+  LLVMDIFlagRValueReference = 1 << 14,
+  LLVMDIFlagReserved = 1 << 15,
+  LLVMDIFlagSingleInheritance = 1 << 16,
+  LLVMDIFlagMultipleInheritance = 2 << 16,
+  LLVMDIFlagVirtualInheritance = 3 << 16,
+  LLVMDIFlagIntroducedVirtual = 1 << 18,
+  LLVMDIFlagBitField = 1 << 19,
+  LLVMDIFlagNoReturn = 1 << 20,
+  LLVMDIFlagMainSubprogram = 1 << 21,
+  LLVMDIFlagIndirectVirtualBase = (1 << 2) | (1 << 5),
+  LLVMDIFlagAccessibility = LLVMDIFlagPrivate | LLVMDIFlagProtected |
+                            LLVMDIFlagPublic,
+  LLVMDIFlagPtrToMemberRep = LLVMDIFlagSingleInheritance |
+                             LLVMDIFlagMultipleInheritance |
+                             LLVMDIFlagVirtualInheritance
 } LLVMDIFlags;
 
 /// Source languages known by DWARF.
 typedef enum {
-#define HANDLE_DW_LANG(ID, NAME) LLVMDWARFSourceLanguage##NAME = ID,
-    #include "llvm/Support/Dwarf.def"
+  LLVMDWARFSourceLanguageC89,
+  LLVMDWARFSourceLanguageC,
+  LLVMDWARFSourceLanguageAda83,
+  LLVMDWARFSourceLanguageC_plus_plus,
+  LLVMDWARFSourceLanguageCobol74,
+  LLVMDWARFSourceLanguageCobol85,
+  LLVMDWARFSourceLanguageFortran77,
+  LLVMDWARFSourceLanguageFortran90,
+  LLVMDWARFSourceLanguagePascal83,
+  LLVMDWARFSourceLanguageModula2,
+  // New in DWARF v3:
+  LLVMDWARFSourceLanguageJava,
+  LLVMDWARFSourceLanguageC99,
+  LLVMDWARFSourceLanguageAda95,
+  LLVMDWARFSourceLanguageFortran95,
+  LLVMDWARFSourceLanguagePLI,
+  LLVMDWARFSourceLanguageObjC,
+  LLVMDWARFSourceLanguageObjC_plus_plus,
+  LLVMDWARFSourceLanguageUPC,
+  LLVMDWARFSourceLanguageD,
+  // New in DWARF v4:
+  LLVMDWARFSourceLanguagePython,
+  // New in DWARF v5:
+  LLVMDWARFSourceLanguageOpenCL,
+  LLVMDWARFSourceLanguageGo,
+  LLVMDWARFSourceLanguageModula3,
+  LLVMDWARFSourceLanguageHaskell,
+  LLVMDWARFSourceLanguageC_plus_plus_03,
+  LLVMDWARFSourceLanguageC_plus_plus_11,
+  LLVMDWARFSourceLanguageOCaml,
+  LLVMDWARFSourceLanguageRust,
+  LLVMDWARFSourceLanguageC11,
+  LLVMDWARFSourceLanguageSwift,
+  LLVMDWARFSourceLanguageJulia,
+  LLVMDWARFSourceLanguageDylan,
+  LLVMDWARFSourceLanguageC_plus_plus_14,
+  LLVMDWARFSourceLanguageFortran03,
+  LLVMDWARFSourceLanguageFortran08,
+  LLVMDWARFSourceLanguageRenderScript,
+  LLVMDWARFSourceLanguageBLISS,
+  // Vendor extensions:
+  LLVMDWARFSourceLanguageMips_Assembler,
+  LLVMDWARFSourceLanguageGOOGLE_RenderScript,
+  LLVMDWARFSourceLanguageBORLAND_Delphi
 } LLVMDWARFSourceLanguage;
 
 /// Qualifiers for types, e.g. \c const.
 typedef enum {
-#define HANDLE_DW_TAG(ID, NAME) LLVMDWARFTypeQualifier##NAME = ID,
-    #include "llvm/Support/Dwarf.def"
+  LLVMDWARFTypeQualifier_null,
+  LLVMDWARFTypeQualifier_array_type,
+  LLVMDWARFTypeQualifier_class_type,
+  LLVMDWARFTypeQualifier_entry_point,
+  LLVMDWARFTypeQualifier_enumeration_type,
+  LLVMDWARFTypeQualifier_formal_parameter,
+  LLVMDWARFTypeQualifier_imported_declaration,
+  LLVMDWARFTypeQualifier_label,
+  LLVMDWARFTypeQualifier_lexical_block,
+  LLVMDWARFTypeQualifier_member,
+  LLVMDWARFTypeQualifier_pointer_type,
+  LLVMDWARFTypeQualifier_reference_type,
+  LLVMDWARFTypeQualifier_compile_unit,
+  LLVMDWARFTypeQualifier_string_type,
+  LLVMDWARFTypeQualifier_structure_type,
+  LLVMDWARFTypeQualifier_subroutine_type,
+  LLVMDWARFTypeQualifier_typedef,
+  LLVMDWARFTypeQualifier_union_type,
+  LLVMDWARFTypeQualifier_unspecified_parameters,
+  LLVMDWARFTypeQualifier_variant,
+  LLVMDWARFTypeQualifier_common_block,
+  LLVMDWARFTypeQualifier_common_inclusion,
+  LLVMDWARFTypeQualifier_inheritance,
+  LLVMDWARFTypeQualifier_inlined_subroutine,
+  LLVMDWARFTypeQualifier_module,
+  LLVMDWARFTypeQualifier_ptr_to_member_type,
+  LLVMDWARFTypeQualifier_set_type,
+  LLVMDWARFTypeQualifier_subrange_type,
+  LLVMDWARFTypeQualifier_with_stmt,
+  LLVMDWARFTypeQualifier_access_declaration,
+  LLVMDWARFTypeQualifier_base_type,
+  LLVMDWARFTypeQualifier_catch_block,
+  LLVMDWARFTypeQualifier_const_type,
+  LLVMDWARFTypeQualifier_constant,
+  LLVMDWARFTypeQualifier_enumerator,
+  LLVMDWARFTypeQualifier_file_type,
+  LLVMDWARFTypeQualifier_friend,
+  LLVMDWARFTypeQualifier_namelist,
+  LLVMDWARFTypeQualifier_namelist_item,
+  LLVMDWARFTypeQualifier_packed_type,
+  LLVMDWARFTypeQualifier_subprogram,
+  LLVMDWARFTypeQualifier_template_type_parameter,
+  LLVMDWARFTypeQualifier_template_value_parameter,
+  LLVMDWARFTypeQualifier_thrown_type,
+  LLVMDWARFTypeQualifier_try_block,
+  LLVMDWARFTypeQualifier_variant_part,
+  LLVMDWARFTypeQualifier_variable,
+  LLVMDWARFTypeQualifier_volatile_type,
+  // New in DWARF v3:
+  LLVMDWARFTypeQualifier_dwarf_procedure,
+  LLVMDWARFTypeQualifier_restrict_type,
+  LLVMDWARFTypeQualifier_interface_type,
+  LLVMDWARFTypeQualifier_namespace,
+  LLVMDWARFTypeQualifier_imported_module,
+  LLVMDWARFTypeQualifier_unspecified_type,
+  LLVMDWARFTypeQualifier_partial_unit,
+  LLVMDWARFTypeQualifier_imported_unit,
+  LLVMDWARFTypeQualifier_condition,
+  LLVMDWARFTypeQualifier_shared_type,
+  // New in DWARF v4:
+  LLVMDWARFTypeQualifier_type_unit,
+  LLVMDWARFTypeQualifier_rvalue_reference_type,
+  LLVMDWARFTypeQualifier_template_alias,
+  // New in DWARF v5:
+  LLVMDWARFTypeQualifier_coarray_type,
+  LLVMDWARFTypeQualifier_generic_subrange,
+  LLVMDWARFTypeQualifier_dynamic_type,
+  LLVMDWARFTypeQualifier_atomic_type,
+  LLVMDWARFTypeQualifier_call_site,
+  LLVMDWARFTypeQualifier_call_site_parameter,
+  LLVMDWARFTypeQualifier_skeleton_unit,
+  LLVMDWARFTypeQualifier_immutable_type,
+  // Vendor extensions:
+  LLVMDWARFTypeQualifier_MIPS_loop,
+  LLVMDWARFTypeQualifier_format_label,
+  LLVMDWARFTypeQualifier_function_template,
+  LLVMDWARFTypeQualifier_class_template,
+  LLVMDWARFTypeQualifier_GNU_template_template_param,
+  LLVMDWARFTypeQualifier_GNU_template_parameter_pack,
+  LLVMDWARFTypeQualifier_GNU_formal_parameter_pack,
+  LLVMDWARFTypeQualifier_APPLE_property,
+  LLVMDWARFTypeQualifier_BORLAND_property,
+  LLVMDWARFTypeQualifier_BORLAND_Delphi_string,
+  LLVMDWARFTypeQualifier_BORLAND_Delphi_dynamic_array,
+  LLVMDWARFTypeQualifier_BORLAND_Delphi_set,
+  LLVMDWARFTypeQualifier_BORLAND_Delphi_variant
 } LLVMDWARFTypeQualifierTag;
 
 /// Special encodings for known types in DWARF.
 typedef enum {
-#define HANDLE_DW_ATE(ID, NAME) LLVMDWARFTypeEncoding_##NAME = ID,
-    #include "llvm/Support/Dwarf.def"
+  LLVMDWARFTypeEncoding_address,
+  LLVMDWARFTypeEncoding_boolean,
+  LLVMDWARFTypeEncoding_complex_float,
+  LLVMDWARFTypeEncoding_float,
+  LLVMDWARFTypeEncoding_signed,
+  LLVMDWARFTypeEncoding_signed_char,
+  LLVMDWARFTypeEncoding_unsigned,
+  LLVMDWARFTypeEncoding_unsigned_char,
+  // New in DWARF v3:
+  LLVMDWARFTypeEncoding_imaginary_float,
+  LLVMDWARFTypeEncoding_packed_decimal,
+  LLVMDWARFTypeEncoding_numeric_string,
+  LLVMDWARFTypeEncoding_edited,
+  LLVMDWARFTypeEncoding_signed_fixed,
+  LLVMDWARFTypeEncoding_unsigned_fixed,
+  LLVMDWARFTypeEncoding_decimal_float,
+  // New in DWARF v4:
+  LLVMDWARFTypeEncoding_UTF,
+  // New in DWARF v5:
+  LLVMDWARFTypeEncoding_UCS,
+  LLVMDWARFTypeEncoding_ASCII,
 } LLVMDWARFTypeEncoding;
 
 /// The amount of debug information to emit.
@@ -277,7 +448,8 @@ LLVMDIBuilderCreateBitFieldMemberType(LLVMDIBuilderRef Builder,
 
 /// Create a permanent forward-declared type.
 LLVMMetadataRef
-LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder, unsigned Tag,
+LLVMDIBuilderCreateForwardDecl(LLVMDIBuilderRef Builder,
+                               LLVMDWARFTypeQualifierTag Tag,
                                const char *Name, LLVMMetadataRef Scope,
                                LLVMMetadataRef File, unsigned Line);
 
@@ -490,14 +662,16 @@ LLVMDIBuilderCreateObjectPointerType(LLVMDIBuilderRef Builder,
 ///                    e.g. LLVMDWARFTypeQualifier_volatile_type
 /// \param FromTy      Base Type.
 LLVMMetadataRef
-LLVMDIBuilderCreateQualifiedType(LLVMDIBuilderRef Builder, unsigned Tag,
+LLVMDIBuilderCreateQualifiedType(LLVMDIBuilderRef Builder,
+                                 LLVMDWARFTypeQualifierTag Tag,
                                  LLVMMetadataRef Type);
 
 
 /// Create debugging information entry for a c++
 /// style reference or rvalue reference type.
 LLVMMetadataRef
-LLVMDIBuilderCreateReferenceType(LLVMDIBuilderRef Builder, unsigned Tag,
+LLVMDIBuilderCreateReferenceType(LLVMDIBuilderRef Builder,
+                                 LLVMDWARFTypeQualifierTag Tag,
                                  LLVMMetadataRef Type);
 
 /// Create C++11 nullptr type.
@@ -507,7 +681,7 @@ LLVMDIBuilderCreateNullPtrType(LLVMDIBuilderRef Builder);
 /// Create a temporary forward-declared type.
 LLVMMetadataRef
 LLVMDIBuilderCreateReplaceableCompositeType(
-    LLVMDIBuilderRef Builder, unsigned Tag, const char *Name,
+    LLVMDIBuilderRef Builder, LLVMDWARFTypeQualifierTag Tag, const char *Name,
     LLVMMetadataRef Scope, LLVMMetadataRef File, unsigned Line);
 
 /// Create unspecified parameter type
@@ -641,7 +815,7 @@ LLVMValueRef LLVMDIBuilderInsertDeclareAtEnd(
 /// \param InsertAtEnd Location for the new intrinsic.
 LLVMValueRef
 LLVMDIBuilderInsertDbgValueIntrinsicAtEnd(
-    LLVMDIBuilderRef Builder, LLVMValueRef Val, uint64_t Offset,
+    LLVMDIBuilderRef Builder, LLVMValueRef Val,
     LLVMMetadataRef VarInfo, LLVMMetadataRef Expr, LLVMMetadataRef Loc,
     LLVMBasicBlockRef InsertAtEnd);
 
@@ -655,7 +829,7 @@ LLVMDIBuilderInsertDbgValueIntrinsicAtEnd(
 /// \param InsertBefore Location for the new intrinsic.
 LLVMValueRef
 LLVMDIBuilderInsertDbgValueIntrinsicBefore(
-    LLVMDIBuilderRef Builder, LLVMValueRef Val, uint64_t Offset,
+    LLVMDIBuilderRef Builder, LLVMValueRef Val,
     LLVMMetadataRef VarInfo, LLVMMetadataRef Expr, LLVMMetadataRef Loc,
     LLVMValueRef InsertBefore);
 
@@ -746,8 +920,7 @@ LLVMDIBuilderCreateTemplateTemplateParameter(
 LLVMMetadataRef
 LLVMDIBuilderCreateNameSpace(LLVMDIBuilderRef Builder,
                              LLVMMetadataRef Scope, const char *Name,
-                             LLVMMetadataRef File, unsigned LineNo,
-                             uint8_t ExportSymbols);
+                             LLVMBool ExportSymbols);
 
 /// Replace arrays on a composite type.
 ///
