@@ -22,18 +22,85 @@ extern "C" {
 
 /// Debug info flags.
 typedef enum {
-#define HANDLE_DI_FLAG(ID, NAME) LLVMDIFlag##NAME = ID,
-    #include "llvm/IR/DebugInfoFlags.def"
-    LLVMDIFlagAccessibility = LLVMDIFlagPrivate
-                            | LLVMDIFlagProtected
-                            | LLVMDIFlagPublic
+  LLVMDIFlagZero = 0,
+  LLVMDIFlagPrivate = 1,
+  LLVMDIFlagProtected = 2,
+  LLVMDIFlagPublic = 3,
+  LLVMDIFlagFwdDecl = 1 << 2,
+  LLVMDIFlagAppleBlock = 1 << 3,
+  LLVMDIFlagBlockByrefStruct = 1 << 4,
+  LLVMDIFlagVirtual = 1 << 5,
+  LLVMDIFlagArtificial = 1 << 6,
+  LLVMDIFlagExplicit = 1 << 7,
+  LLVMDIFlagPrototyped = 1 << 8,
+  LLVMDIFlagObjcClassComplete = 1 << 9,
+  LLVMDIFlagObjectPointer = 1 << 10,
+  LLVMDIFlagVector = 1 << 11,
+  LLVMDIFlagStaticMember = 1 << 12,
+  LLVMDIFlagLValueReference = 1 << 13,
+  LLVMDIFlagRValueReference = 1 << 14,
+  LLVMDIFlagReserved = 1 << 15,
+  LLVMDIFlagSingleInheritance = 1 << 16,
+  LLVMDIFlagMultipleInheritance = 2 << 16,
+  LLVMDIFlagVirtualInheritance = 3 << 16,
+  LLVMDIFlagIntroducedVirtual = 1 << 18,
+  LLVMDIFlagBitField = 1 << 19,
+  LLVMDIFlagNoReturn = 1 << 20,
+  LLVMDIFlagMainSubprogram = 1 << 21,
+  LLVMDIFlagIndirectVirtualBase = (1 << 2) | (1 << 5),
+  LLVMDIFlagAccessibility = LLVMDIFlagPrivate | LLVMDIFlagProtected |
+                            LLVMDIFlagPublic,
+  LLVMDIFlagPtrToMemberRep = LLVMDIFlagSingleInheritance |
+                             LLVMDIFlagMultipleInheritance |
+                             LLVMDIFlagVirtualInheritance
 } LLVMDIFlags;
 
 /// Source languages known by DWARF.
 typedef enum {
-#define HANDLE_DW_LANG(ID, NAME, VERSION, VENDOR) \
-    LLVMDWARFSourceLanguage##NAME = ID,
-    #include "llvm/BinaryFormat/Dwarf.def"
+  LLVMDWARFSourceLanguageC89,
+  LLVMDWARFSourceLanguageC,
+  LLVMDWARFSourceLanguageAda83,
+  LLVMDWARFSourceLanguageC_plus_plus,
+  LLVMDWARFSourceLanguageCobol74,
+  LLVMDWARFSourceLanguageCobol85,
+  LLVMDWARFSourceLanguageFortran77,
+  LLVMDWARFSourceLanguageFortran90,
+  LLVMDWARFSourceLanguagePascal83,
+  LLVMDWARFSourceLanguageModula2,
+  // New in DWARF v3:
+  LLVMDWARFSourceLanguageJava,
+  LLVMDWARFSourceLanguageC99,
+  LLVMDWARFSourceLanguageAda95,
+  LLVMDWARFSourceLanguageFortran95,
+  LLVMDWARFSourceLanguagePLI,
+  LLVMDWARFSourceLanguageObjC,
+  LLVMDWARFSourceLanguageObjC_plus_plus,
+  LLVMDWARFSourceLanguageUPC,
+  LLVMDWARFSourceLanguageD,
+  // New in DWARF v4:
+  LLVMDWARFSourceLanguagePython,
+  // New in DWARF v5:
+  LLVMDWARFSourceLanguageOpenCL,
+  LLVMDWARFSourceLanguageGo,
+  LLVMDWARFSourceLanguageModula3,
+  LLVMDWARFSourceLanguageHaskell,
+  LLVMDWARFSourceLanguageC_plus_plus_03,
+  LLVMDWARFSourceLanguageC_plus_plus_11,
+  LLVMDWARFSourceLanguageOCaml,
+  LLVMDWARFSourceLanguageRust,
+  LLVMDWARFSourceLanguageC11,
+  LLVMDWARFSourceLanguageSwift,
+  LLVMDWARFSourceLanguageJulia,
+  LLVMDWARFSourceLanguageDylan,
+  LLVMDWARFSourceLanguageC_plus_plus_14,
+  LLVMDWARFSourceLanguageFortran03,
+  LLVMDWARFSourceLanguageFortran08,
+  LLVMDWARFSourceLanguageRenderScript,
+  LLVMDWARFSourceLanguageBLISS,
+  // Vendor extensions:
+  LLVMDWARFSourceLanguageMips_Assembler,
+  LLVMDWARFSourceLanguageGOOGLE_RenderScript,
+  LLVMDWARFSourceLanguageBORLAND_Delphi
 } LLVMDWARFSourceLanguage;
 
 /// The amount of debug information to emit.

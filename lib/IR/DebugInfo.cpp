@@ -701,6 +701,16 @@ void Instruction::applyMergedLocation(const DILocation *LocA,
 // LLVM C API implementations.
 //===----------------------------------------------------------------------===//
 
+static unsigned map_from_llvmDWARFsourcelanguage(LLVMDWARFSourceLanguage lang) {
+  switch (lang) {
+#define HANDLE_DW_LANG(ID, NAME, VERSION, VENDOR) \
+case LLVMDWARFSourceLanguage##NAME: return ID;
+#include "llvm/BinaryFormat/Dwarf.def"
+#undef HANDLE_DW_LANG
+  }
+  llvm_unreachable("Unhandled Tag");
+}
+
 unsigned LLVMDebugMetadataVersion() {
   return DEBUG_METADATA_VERSION;
 }
@@ -739,7 +749,7 @@ LLVMMetadataRef LLVMDIBuilderCreateCompileUnit(
   auto File = unwrap<DIFile>(FileRef);
 
   return wrap(unwrap(Builder)->createCompileUnit(
-                 static_cast<unsigned>(Lang), File,
+                 map_from_llvmDWARFsourcelanguage(Lang), File,
                  StringRef(Producer, ProducerLen), isOptimized,
                  StringRef(Flags, FlagsLen), RuntimeVer,
                  StringRef(SplitName, SplitNameLen),
