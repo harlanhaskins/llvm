@@ -1137,11 +1137,23 @@ LLVMTypeRef LLVMLabelTypeInContext(LLVMContextRef C);
 LLVMTypeRef LLVMX86MMXTypeInContext(LLVMContextRef C);
 
 /**
+ * Create a token type in a context.
+ */
+LLVMTypeRef LLVMTokenTypeInContext(LLVMContextRef C);
+
+/**
+ * Create a metadata type in a context.
+ */
+LLVMTypeRef LLVMMetadataTypeInContext(LLVMContextRef C);
+
+/**
  * These are similar to the above functions except they operate on the
  * global context.
  */
 LLVMTypeRef LLVMVoidType(void);
 LLVMTypeRef LLVMLabelType(void);
+LLVMTypeRef LLVMTokenType(void);
+LLVMTypeRef LLVMMetadataType(void);
 LLVMTypeRef LLVMX86MMXType(void);
 
 /**
