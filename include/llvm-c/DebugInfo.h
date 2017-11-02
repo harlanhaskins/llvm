@@ -23,8 +23,8 @@
 extern "C" {
 #endif
 
-/*
- Debug info flags.
+/**
+ * Debug info flags.
  */
 typedef enum {
   LLVMDIFlagZero = 0,
@@ -226,7 +226,7 @@ LLVMDIBuilderCreateDebugLocation(LLVMContextRef Ctx, unsigned Line,
                                  LLVMMetadataRef InlinedAt);
 
 #ifdef __cplusplus
-} // end extern "C"
+} /* end extern "C" */
 #endif
 
 #endif
